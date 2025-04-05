@@ -1,5 +1,24 @@
 services:
 
+  scrooge-backend:
+    image: docker.io/library/scrooge-be:latest
+    container_name: "scrooge_backend"
+    depends_on:
+      scrooge-nginx:
+        condition: service_healthy
+    environment:
+      SCROOGE_INFRASTRUCTURE_WEB_TRUSTED-ISSUERS: "https://sso.scrooge.io/realms/scrooge-realm"
+    networks:
+      - scrooge-network
+    ports:
+      - "8090:8090"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    restart: no
+
+
   scrooge-nginx:
     image: nginx:1.27-alpine
     container_name: "scrooge_nginx"
@@ -7,7 +26,9 @@ services:
       scrooge-keycloak:
         condition: service_healthy
     networks:
-      - scrooge-network
+      scrooge-network:
+        aliases:
+          - sso.scrooge.io
     ports:
       - "443:443"
     volumes:
@@ -74,9 +95,7 @@ services:
     command:
       - "start-dev"
     networks:
-      scrooge-network:
-        aliases:
-          - sso.scrooge.io
+      - scrooge-network
     ports:
       - "8080:8080"
     deploy:
