@@ -1,0 +1,169 @@
+services:
+
+  scrooge-nginx:
+    image: nginx:1.27-alpine
+    container_name: "scrooge_nginx"
+    depends_on:
+      scrooge-keycloak:
+        condition: service_healthy
+    networks:
+      - scrooge-network
+    ports:
+      - "443:443"
+    volumes:
+      - "scrooge-nginx-conf:/etc/nginx/conf.d"
+      - "scrooge-nginx-certs:/etc/nginx/certs"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -k --fail https://scrooge.io || exit 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  scrooge-keycloak-config-cli:
+    image: adorsys/keycloak-config-cli:6.2.1-23
+    container_name: "scrooge_keycloak_config_cli"
+    depends_on:
+      scrooge-keycloak:
+        condition: service_healthy
+    environment:
+      KEYCLOAK_URL: http://scrooge-keycloak:8080/
+      KEYCLOAK_USER: "keycloak_usr"
+      KEYCLOAK_PASSWORD: "keycloak_pwd"
+      KEYCLOAK_AVAILABILITYCHECK_ENABLED: true
+      KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: 120s
+      KEYCLOAK_SSLVERIFY: false
+      IMPORT_FILES_LOCATIONS: '/config/*'
+      LOGGING_LEVEL_ROOT: INFO
+    networks:
+      - scrooge-network
+    volumes:
+      - "scrooge-keycloak-config-cli:/config"
+
+  scrooge-keycloak:
+    image: quay.io/keycloak/keycloak:23.0.0
+    container_name: "scrooge_keycloak"
+    depends_on:
+      scrooge-postgres:
+        condition: service_healthy
+    environment:
+      # Imposta le credenziali di root
+      KEYCLOAK_ADMIN: "keycloak_usr"
+      KEYCLOAK_ADMIN_PASSWORD: "keycloak_pwd"
+      # Abilita gli endpoint per il monitoring e le metriche
+      # http://localhost:8080/health/ready
+      # http://localhost:8080/metrics
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      # Necessarie per prod
+      KC_HOSTNAME: "sso.scrooge.io"
+      KC_PROXY: edge
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT: false
+      # Abilita l'uso di un DB esterno
+      KC_DB: postgres
+      KC_DB_SCHEMA: public
+      KC_DB_URL_HOST: scrooge-postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: "postgres_usr"
+      KC_DB_PASSWORD: "postgres_pwd"
+    command:
+      - "start-dev"
+    networks:
+      scrooge-network:
+        aliases:
+          - sso.scrooge.io
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          # Keycloak calcola dinamicamente la dimensione dell'heap
+          # in base alla memoria totale del container;
+          # Quindi, è necessario impostare il limite di memoria per il container.
+          # https://www.keycloak.org/server/containers
+          memory: 2G
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  scrooge-postgres:
+    image: postgres:17.2
+    container_name: "scrooge_postgres"
+    environment:
+      POSTGRES_USER: "postgres_usr"
+      POSTGRES_PASSWORD: "postgres_pwd"
+      POSTGRES_MULTIPLE_DATABASES: "keycloak,scrooge"
+    networks:
+      - scrooge-network
+    ports:
+      - "5432:5432"
+    volumes:
+      - "scrooge-postgres-data:/var/lib/postgresql/data/"
+      - "scrooge-postgres-init-script:/docker-entrypoint-initdb.d/:ro"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d keycloak -U postgres_usr" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  scrooge-network:
+    name: scrooge_network
+    driver: bridge
+    external: false
+
+volumes:
+
+  scrooge-nginx-conf:
+    name: scrooge_nginx_conf
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./_nginx/conf
+
+  scrooge-nginx-certs:
+    name: scrooge_nginx_certs
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./_nginx/certs
+
+  scrooge-keycloak-config-cli:
+    name: scrooge_keycloak_config_cli
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./_keycloak_config_cli/conf
+
+  scrooge-postgres-data:
+    name: scrooge_postgres_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./_postgres/_internal
+
+  scrooge-postgres-init-script:
+    name: scrooge_postgres_init_script
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./_postgres/sql

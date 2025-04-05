@@ -1,0 +1,38 @@
+{
+  "enabled": true,
+  "realm": "scrooge-realm",
+  "users": [
+    {
+      "username": "scrooge_usr",
+      "email": "scrooge_usr@no.op",
+      "enabled": true,
+      "firstName": "Christian",
+      "lastName": "Luzzetti",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "scrooge_pwd"
+        }
+      ],
+      "realmRoles": [
+        "scrooge-user"
+      ]
+    },
+    {
+      "username": "scrooge_admin",
+      "email": "scrooge_admin@no.op",
+      "enabled": true,
+      "firstName": "Adminis",
+      "lastName": "trator",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "scrooge_pwd"
+        }
+      ],
+      "realmRoles": [
+        "scrooge-admin"
+      ]
+    }
+  ]
+}

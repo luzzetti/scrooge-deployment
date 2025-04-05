@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "realm": "scrooge-realm",
+  "roles": {
+    "realm": [
+      {
+        "name": "scrooge-admin",
+        "description": "The admin role, to access the administration area",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "scrooge-user",
+        "description": "The user role, to access the user area",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  }
+}
