@@ -3,8 +3,8 @@
   "realm": "scrooge-realm",
   "users": [
     {
-      "username": "scrooge_usr",
-      "email": "scrooge_usr@no.op",
+      "username": "scrooge@usr.op",
+      "email": "scrooge@usr.op",
       "enabled": true,
       "firstName": "Christian",
       "lastName": "Luzzetti",
@@ -19,8 +19,8 @@
       ]
     },
     {
-      "username": "scrooge_admin",
-      "email": "scrooge_admin@no.op",
+      "username": "scrooge@admin.op",
+      "email": "scrooge@admin.op",
       "enabled": true,
       "firstName": "Adminis",
       "lastName": "trator",

@@ -1,6 +1,10 @@
 {
   "enabled": true,
   "realm": "scrooge-realm",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "rememberMe": false,
   "clients": [
     {
       "clientId": "scrooge-client-fe",
