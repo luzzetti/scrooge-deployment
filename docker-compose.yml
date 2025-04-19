@@ -1,13 +1,14 @@
 services:
 
   scrooge-frontend:
-    image: docker.io/library/scrooge-frontend:latest
+#    image: docker.io/library/scrooge-frontend:latest
+    image: ghcr.io/luzzetti/scrooge-frontend:latest
     container_name: "scrooge_frontend"
     depends_on:
       scrooge-nginx:
         condition: service_healthy
     ports:
-      - "4200:4200"
+      - "4200:80"
     networks:
       - scrooge-network
     deploy:
@@ -17,12 +18,15 @@ services:
     restart: no
 
   scrooge-backend:
-    image: docker.io/library/scrooge-be:latest
+#    image: docker.io/library/scrooge-be:latest
+    image: "ghcr.io/luzzetti/scrooge-backend:latest"
     container_name: "scrooge_backend"
     depends_on:
       scrooge-nginx:
         condition: service_healthy
     environment:
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: DEBUG
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://scrooge-postgres:5432/scrooge"
       SCROOGE_INFRASTRUCTURE_WEB_TRUSTED-ISSUERS: "https://sso.scrooge.io/realms/scrooge-realm"
     networks:
       - scrooge-network

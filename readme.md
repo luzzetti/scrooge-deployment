@@ -7,7 +7,7 @@ https://superuser.com/questions/463081/adding-self-signed-certificate-to-trusted
 
 
 Aggiungere al file-host:
-127.0.0.1	api.scrooge.lan sso.scrooge.lan www.scrooge.lan
+127.0.0.1	api.scrooge.io sso.scrooge.io www.scrooge.io
 
 Aggiungere il certificato alle ca-root affidabili
 
