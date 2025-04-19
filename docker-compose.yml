@@ -40,7 +40,8 @@ services:
 
 
   scrooge-nginx:
-    image: nginx:1.27-alpine
+    build:
+      context: ./_nginx
     container_name: "scrooge_nginx"
     depends_on:
       scrooge-keycloak:
@@ -51,9 +52,6 @@ services:
           - sso.scrooge.io
     ports:
       - "443:443"
-    volumes:
-      - "scrooge-nginx-conf:/etc/nginx/conf.d"
-      - "scrooge-nginx-certs:/etc/nginx/certs"
     deploy:
       resources:
         limits:
@@ -66,7 +64,8 @@ services:
       retries: 5
 
   scrooge-keycloak-config-cli:
-    image: adorsys/keycloak-config-cli:6.2.1-23
+    build:
+      context: ./_keycloak_config_cli
     container_name: "scrooge_keycloak_config_cli"
     depends_on:
       scrooge-keycloak:
@@ -82,8 +81,6 @@ services:
       LOGGING_LEVEL_ROOT: INFO
     networks:
       - scrooge-network
-    volumes:
-      - "scrooge-keycloak-config-cli:/config"
 
   scrooge-keycloak:
     image: quay.io/keycloak/keycloak:23.0.0
@@ -135,7 +132,8 @@ services:
       start_period: 20s
 
   scrooge-postgres:
-    image: postgres:17.2
+    build:
+      context: ./_postgres
     container_name: "scrooge_postgres"
     environment:
       POSTGRES_USER: "postgres_usr"
@@ -147,7 +145,6 @@ services:
       - "5432:5432"
     volumes:
       - "scrooge-postgres-data:/var/lib/postgresql/data/"
-      - "scrooge-postgres-init-script:/docker-entrypoint-initdb.d/:ro"
     deploy:
       resources:
         limits:
@@ -167,42 +164,5 @@ networks:
 
 volumes:
 
-  scrooge-nginx-conf:
-    name: scrooge_nginx_conf
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./_nginx/conf
-
-  scrooge-nginx-certs:
-    name: scrooge_nginx_certs
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./_nginx/certs
-
-  scrooge-keycloak-config-cli:
-    name: scrooge_keycloak_config_cli
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./_keycloak_config_cli/conf
-
   scrooge-postgres-data:
     name: scrooge_postgres_data
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./_postgres/_internal
-
-  scrooge-postgres-init-script:
-    name: scrooge_postgres_init_script
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./_postgres/sql
