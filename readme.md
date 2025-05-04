@@ -1,48 +1,35 @@
 
 # Scrooge Deployment
 
-## Setup dell'ambiente
+## Setup Semplificato
+
+1. Assicurarsi di avere "Docker Desktop" installato ed avviato sul PC 
+2. Su windows, cliccare con il tasto destro sul file "setup-scrooge-environment.bat" nella root di questo repository e selezionare "Avvia come amministratore"
+3. Attendere che vengano scaricate ed avviate su docker tutte le immagini necessarie
+4. Recarsi su "https://www.scrooge.io"
+
+## Setup Manuale dell'ambiente
 
 Affinché l'app funzione correttamente, c'è la necessità di:
 1. Aggiungere i domain names al file hosts
-2. Aggiungere i certificati SSL come CA root affidabili
-3. Avviare lo stack con docker compose
-
-### Automated Setup
-
-We provide scripts to automate tasks 1 and 2 for both Windows and Unix systems:
-
-#### Windows (CMD)
-Run the batch file as Administrator:
-```batch
-setup-scrooge-environment.bat
-```
-
-#### Unix (Linux/macOS)
-Run the shell script with sudo:
-```bash
-sudo ./setup-scrooge-environment.sh
-```
-
-### Manual Setup
-
-If you prefer to set up manually:
-
-1. Add the following line to your hosts file:
    ```
    127.0.0.1 api.scrooge.io sso.scrooge.io www.scrooge.io
    ```
-   - Windows: `%windir%\System32\drivers\etc\hosts`
-   - Unix: `/etc/hosts`
+2. Aggiungere i certificati SSL come CA root affidabili del computer
+   - Windows: Fare doppio click su `_nginx\certs\scrooge.io.crt` e seguire il wizard
+   - Unix: Dipende dalla distribuzione
+   
+- Nota: Assicurarsi di riavviare il browser e/o il computer. Se raggiungendo le pagine del progetto si riceve un errore del browser relativo al certificato non valido, non sarà possibile far funzionare correttamente il progetto
 
-2. Add the SSL certificate to your trusted root CA store:
-   - Windows: Double-click on `_nginx\certs\scrooge.io.crt` and follow the wizard
-   - Unix: Varies by distribution (see the shell script for details)
+3. Avviare lo stack con docker compose, buildando le immagini necessarie, lanciando il seguente comando *dalla root di questo progetto*
+   - docker compose scrooge-deployment up -d --build
 
+## Link & indirizzi
 
-After setup, you can access:
-- https://www.scrooge.io
-- https://sso.scrooge.io/
-- https://api.scrooge.io/
-
-
+Dopo l'installazione, se tutto è andato a buon fine, dovresti essere in grado di raggiungere i seguenti indirizzi:
+* Frontend
+  - https://www.scrooge.io
+* Keycloak
+  - https://sso.scrooge.io/
+* Documentazione Backend
+  - https://api.scrooge.io/swagger-ui/index.html
