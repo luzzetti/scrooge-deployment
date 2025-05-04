@@ -5,7 +5,9 @@
 
 1. Assicurarsi di avere "Docker Desktop" installato ed avviato sul PC 
 2. Su windows, cliccare con il tasto destro sul file "setup-scrooge-environment.bat" nella root di questo repository e selezionare "Avvia come amministratore"
-3. Attendere che vengano scaricate ed avviate su docker tutte le immagini necessarie
+3. Attendere che vengano scaricate ed avviate su docker tutte le immagini
+   - Nota: Il container "scrooge-keycloak-config-cli" non è necessario che resti avviato. 
+   - Se mostra lo status "Exited" vuol dire che è partito, ha configurato correttamente KC, e si è spento. 
 4. Recarsi su "https://www.scrooge.io"
 
 ## Setup Manuale dell'ambiente
