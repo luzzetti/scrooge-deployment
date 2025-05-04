@@ -24,7 +24,7 @@ Affinché l'app funzione correttamente, c'è la necessità di:
 - Nota: Assicurarsi di riavviare il browser e/o il computer. Se raggiungendo le pagine del progetto si riceve un errore del browser relativo al certificato non valido, non sarà possibile far funzionare correttamente il progetto
 
 3. Avviare lo stack con docker compose, buildando le immagini necessarie, lanciando il seguente comando *dalla root di questo progetto*
-   - docker compose scrooge-deployment up -d --build
+   - docker compose up -d --build
 
 ## Link & indirizzi
 
